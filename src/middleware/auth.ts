@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const isProtected = (req: Request, res: Response, next: NextFunction) => {
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
   if (!authorization) return res.send(401).send({ msg: "token missing" });
   try {
@@ -12,4 +12,4 @@ const isProtected = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default isProtected;
+export default authMiddleware;
