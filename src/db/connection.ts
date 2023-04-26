@@ -7,7 +7,7 @@ const connectDB = (app: Express) => {
   const connectionURL = process.env.MONGODB_URL;
 
   mongoose
-    .connect(`${connectionURL}`)
+    .connect(connectionURL)
     .then(() => {
       app.emit("dbConnected");
     })
