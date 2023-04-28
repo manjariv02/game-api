@@ -1,14 +1,29 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+export interface jwtPayload extends JwtPayload {
+  playerId?: string;
+  userId?: string;
+}
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const { authorization } = req.headers;
-  if (!authorization) return res.send(401).send({ msg: "token missing" });
   try {
-    let decoded: any = jwt.verify(authorization.split(" ")[1], "secret");
-    next();
+    const { authorization } = req.headers;
+    if (authorization) {
+      const decoded: jwtPayload = <JwtPayload>(
+        jwt.verify(authorization.split(" ")[1], "secret")
+      );
+      if (decoded) {
+        req.user = {
+          playerId: decoded.playerId,
+          userId: decoded.userId,
+        };
+        return next();
+      }
+    }
+    throw res.status(401).json({ msg: "token missing" });
   } catch (error) {
-    res.send(401).send({ msg: error });
+    res.status(401).json({ msg: error });
   }
 };
 

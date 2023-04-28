@@ -3,12 +3,12 @@ import { ILobby } from "./Lobby";
 import { IInventory } from "./Inventory";
 
 export interface IPlayer extends Document {
-  name: string;
-  pic: string;
-  friends: IPlayer["_id"][];
-  friendRequests: IPlayer["_id"][];
-  lobby: ILobby["_id"][];
-  inventory: IInventory["_id"];
+  name?: string;
+  pic?: string;
+  friends?: IPlayer["_id"][];
+  friendRequests?: IPlayer["_id"][];
+  lobby?: ILobby["_id"][];
+  inventory?: IInventory["_id"];
 }
 
 const PlayerSchema: Schema<IPlayer> = new Schema({

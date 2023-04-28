@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../db/models/User";
+import Player, { IPlayer } from "../db/models/Players";
+import { jwtPayload } from "../middleware/auth";
 
 const registerRouter = express.Router();
 
@@ -16,21 +18,26 @@ registerRouter.post("/", async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         if (hashedPassword) {
-          const newUser: IUser = await User.create({
-            email,
-            password: hashedPassword,
-          });
+          const newPlayer: IPlayer = await Player.create({});
+          if (newPlayer) {
+            const newUser: IUser = await User.create({
+              email,
+              password: hashedPassword,
+              player: newPlayer._id,
+            });
 
-          if (newUser) {
-            const token = jwt.sign(
-              { email: newUser.email, id: newUser._id },
-              "secret",
-              {
+            if (newUser) {
+              const payload: jwtPayload = {
+                playerId: newPlayer._id,
+                userId: newUser._id,
+              };
+              const token = jwt.sign(payload, "secret", {
                 expiresIn: "1h",
+              });
+
+              if (token) {
+                return res.status(200).json({ token });
               }
-            );
-            if (token) {
-              return res.status(200).json({ token });
             }
           }
         }

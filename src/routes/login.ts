@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../db/models/User";
+import Player, { IPlayer } from "../db/models/Players";
 
 const loginRouter = express.Router();
 
@@ -19,11 +20,11 @@ loginRouter.post("/", async (req: Request, res: Response) => {
         );
 
         if (isPasswordCorrect) {
-          const token = jwt.sign(
-            { email: existingUser.email, id: existingUser._id },
-            "secret",
-            { expiresIn: "1h" }
-          );
+          const payload = {
+            playerId: existingUser.player,
+            userId: existingUser._id,
+          };
+          const token = jwt.sign(payload, "secret", { expiresIn: "1h" });
 
           if (token) return res.status(200).json({ token });
         }
