@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLString } from "graphql";
+import getPlayer from "./player/getPlayer";
 
 const user = {
   type: GraphQLString,
@@ -8,7 +9,7 @@ const user = {
 const rootQuery = new GraphQLObjectType({
   name: "Query",
   fields: {
-    usersList: user,
+    getPlayer,
   },
 });
 
