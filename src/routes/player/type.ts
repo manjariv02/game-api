@@ -18,6 +18,8 @@ const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
     _id: { type: GraphQLString },
     name: { type: GraphQLString },
     pic: { type: GraphQLString },
+    friends: { type: new GraphQLList(GraphQLString) },
+    friendRequests: { type: new GraphQLList(GraphQLString) },
   }),
 });
 
