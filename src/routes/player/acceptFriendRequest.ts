@@ -30,7 +30,7 @@ const acceptFriendRequest = {
 
             const confirmRequest = player.friends?.push(friendId);
 
-            const requestIndex = player.friends?.indexOf(friendId);
+            const requestIndex = player.friendRequests?.indexOf(friendId);
             console.log({ requestIndex });
 
             if (requestIndex && requestIndex > -1) {
