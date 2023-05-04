@@ -31,7 +31,6 @@ const acceptFriendRequest = {
             const confirmRequest = player.friends?.push(friendId);
 
             const requestIndex = player.friendRequests?.indexOf(friendId);
-            console.log({ requestIndex });
 
             if (requestIndex && requestIndex > -1) {
               const removeRequest = player.friendRequests?.splice(
