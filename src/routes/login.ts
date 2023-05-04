@@ -24,7 +24,7 @@ loginRouter.post("/", async (req: Request, res: Response) => {
             playerId: existingUser.player,
             userId: existingUser._id,
           };
-          const token = jwt.sign(payload, "secret", { expiresIn: "1h" });
+          const token = jwt.sign(payload, "secret", { expiresIn: "3d" });
 
           if (token) return res.status(200).json({ token });
         }
