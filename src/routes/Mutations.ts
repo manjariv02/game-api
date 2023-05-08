@@ -7,6 +7,7 @@ import acceptFriendRequest from "./player/acceptFriendRequest";
 import createLobby from "./lobby/createLobby";
 import updateLobby from "./lobby/updateLobby";
 import deleteLobby from "./lobby/deleteLobby";
+import updateInventory from "./inventory/updateInventory";
 
 const rootMutations = new GraphQLObjectType({
   name: "Mutation",
@@ -17,6 +18,7 @@ const rootMutations = new GraphQLObjectType({
     createLobby,
     updateLobby,
     deleteLobby,
+    updateInventory,
   },
 });
 
