@@ -6,6 +6,7 @@ import {
 } from "graphql";
 import { IPlayer } from "../../db/models/Players";
 import { responseType } from "../Types";
+import LobbyType from "../lobby/type";
 
 export interface PlayerResponse extends responseType {
   result?: IPlayer;
@@ -20,6 +21,7 @@ const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
     pic: { type: GraphQLString },
     friends: { type: new GraphQLList(GraphQLString) },
     friendRequests: { type: new GraphQLList(GraphQLString) },
+    lobby: { type: LobbyType },
   }),
 });
 

@@ -17,6 +17,8 @@ const getPlayer = {
             _id: player?._id,
             name: player?.name,
             pic: player?.pic,
+            friends: player?.friends,
+            friendRequests: player?.friendRequests,
           })),
           status: 200,
         };
