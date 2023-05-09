@@ -16,42 +16,23 @@ const acceptFriendRequest = {
     try {
       const playerId = req.user?.playerId;
 
-      if (playerId) {
-        const player = await Player.findById(playerId);
+      if (playerId && friendId) {
+        const acceptRequest = await acceptFriendAndRemoveRequests(
+          playerId,
+          friendId
+        );
+        const acceptFriendsRequest = await acceptFriendAndRemoveRequests(
+          friendId,
+          playerId
+        );
 
-        if (player) {
-          const checkInFriendRequests =
-            player.friendRequests?.includes(friendId);
-
-          if (checkInFriendRequests) {
-            const existingFriend = player.friends?.includes(friendId);
-
-            if (existingFriend) throw "This player is already your friend";
-
-            const confirmRequest = player.friends?.push(friendId);
-
-            const requestIndex = player.friendRequests?.indexOf(friendId);
-
-            if (requestIndex === 0 && requestIndex > -1) {
-              const removeRequest = player.friendRequests?.splice(
-                requestIndex,
-                1
-              );
-
-              if (confirmRequest && removeRequest) {
-                const updatedPlayer = await player.save();
-
-                if (confirmRequest) {
-                  return {
-                    result: updatedPlayer,
-                    status: 200,
-                  };
-                }
-              }
-            }
-          }
+        if (acceptRequest && acceptFriendsRequest) {
+          return {
+            status: 200,
+          };
         }
       }
+
       throw "Something went wrong";
     } catch (error) {
       return {
@@ -60,6 +41,50 @@ const acceptFriendRequest = {
       };
     }
   },
+};
+
+const acceptFriendAndRemoveRequests = async (
+  playerId: string,
+  friendId: string
+) => {
+  try {
+    const player = await Player.findById(playerId);
+
+    if (player) {
+      const checkInFriendRequests = player.friendRequests?.includes(friendId);
+
+      if (checkInFriendRequests) {
+        const existingFriend = player.friends?.includes(friendId);
+
+        if (existingFriend) throw "This player is already your friend";
+
+        const confirmRequest = player.friends?.push(friendId);
+
+        if (confirmRequest) {
+          const requestIndex = player.friendRequests?.indexOf(friendId);
+
+          if (typeof requestIndex === "number" && requestIndex > -1) {
+            const removedId = player.friendRequests?.splice(requestIndex, 1);
+            if (removedId) await player.save();
+          }
+
+          const requestSentIndex = player.friendRequestsSent?.indexOf(friendId);
+
+          if (typeof requestSentIndex === "number" && requestSentIndex > -1) {
+            const removedId = player.friendRequestsSent?.splice(
+              requestSentIndex,
+              1
+            );
+            if (removedId) await player.save();
+          }
+
+          return true;
+        }
+      }
+    }
+  } catch (err) {
+    throw err;
+  }
 };
 
 export default acceptFriendRequest;

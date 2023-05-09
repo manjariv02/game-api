@@ -19,30 +19,32 @@ registerRouter.post("/", async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         if (hashedPassword) {
-          const newPlayer: IPlayer = await Player.create({});
           const newInventory: IInventory = await Inventory.create({});
-          if (newPlayer && newInventory) {
-            const newUser: IUser = await User.create({
-              email,
-              password: hashedPassword,
-              player: newPlayer._id,
-            });
 
-            const playerInventory: IPlayer = await Player.create({
+          if (newInventory) {
+            const newPlayer: IPlayer = await Player.create({
               inventory: newInventory._id,
             });
 
-            if (newUser && playerInventory) {
-              const payload: jwtPayload = {
-                playerId: newPlayer._id,
-                userId: newUser._id,
-              };
-              const token = jwt.sign(payload, "secret", {
-                expiresIn: "1h",
+            if (newPlayer) {
+              const newUser: IUser = await User.create({
+                email,
+                password: hashedPassword,
+                player: newPlayer._id,
               });
 
-              if (token) {
-                return res.status(200).json({ token });
+              if (newUser) {
+                const payload: jwtPayload = {
+                  playerId: newPlayer._id,
+                  userId: newUser._id,
+                };
+                const token = jwt.sign(payload, "secret", {
+                  expiresIn: "1h",
+                });
+
+                if (token) {
+                  return res.status(200).json({ token });
+                }
               }
             }
           }

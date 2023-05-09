@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IInventory extends Document {
-  normalArr: number;
-  fireArr: number;
+  normalArr?: number;
+  fireArr?: number;
 }
 
 const InventorySchema: Schema<IInventory> = new Schema({

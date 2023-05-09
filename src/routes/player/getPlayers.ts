@@ -10,16 +10,16 @@ const getPlayers = {
       const playerId = req.user?.playerId;
 
       if (playerId) {
-        const result = await Player.findById(playerId)
+        const results = await Player.find()
           .populate("lobby")
           .populate("friends")
           .populate("friendRequests")
           .populate("friendRequestsSent")
           .populate("inventory");
 
-        if (result) {
+        if (results) {
           return {
-            result,
+            results,
             status: 200,
           };
         }

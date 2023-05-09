@@ -1,8 +1,8 @@
 import PlayerType from "../player/type";
 import { Request } from "express";
-import Player from "../../db/models/Players";
 import { GraphQLInt, GraphQLNonNull } from "graphql";
-import { IInventory } from "../../db/models/Inventory";
+import Inventory, { IInventory } from "../../db/models/Inventory";
+import Player from "../../db/models/Players";
 
 const updateInventory = {
   type: PlayerType,
@@ -19,21 +19,26 @@ const updateInventory = {
       const playerId = req.user?.playerId;
 
       if (playerId) {
-        const inventoryUpdate = await Player.findOneAndUpdate(
-          { _id: playerId },
-          { normalArr, fireArr },
-          { new: true }
-        );
+        const player = await Player.findById(playerId);
 
-        if (inventoryUpdate) {
-          return {
-            result: {
-              _id: inventoryUpdate._id,
-            },
-            status: 200,
-          };
+        if (player) {
+          const inventoryUpdate = await Inventory.findOneAndUpdate(
+            { _id: player.inventory },
+            { normalArr, fireArr },
+            { new: true }
+          );
+
+          if (inventoryUpdate) {
+            return {
+              result: {
+                _id: inventoryUpdate._id,
+              },
+              status: 200,
+            };
+          }
         }
       }
+      throw "Something went wrong! ";
     } catch (error) {
       return {
         status: 400,

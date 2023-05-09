@@ -24,14 +24,16 @@ const updatePlayer = {
           { new: true }
         );
 
-        return {
-          result: {
-            _id: playerUpdate?._id,
-            name: playerUpdate?.name,
-            pic: playerUpdate?.pic,
-          },
-          status: 200,
-        };
+        if (playerUpdate) {
+          return {
+            result: {
+              _id: playerUpdate?._id,
+              name: playerUpdate?.name,
+              pic: playerUpdate?.pic,
+            },
+            status: 200,
+          };
+        }
       }
 
       throw "Something went wrong";

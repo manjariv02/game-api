@@ -12,13 +12,13 @@ import updateInventory from "./inventory/updateInventory";
 const rootMutations = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    acceptFriendRequest,
     createFriendRequest,
+    acceptFriendRequest,
     updatePlayer,
+    updateInventory,
     createLobby,
     updateLobby,
     deleteLobby,
-    updateInventory,
   },
 });
 

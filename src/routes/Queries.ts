@@ -1,20 +1,18 @@
 import { GraphQLObjectType, GraphQLString } from "graphql";
+import getPlayers from "./player/getPlayers";
 import getPlayer from "./player/getPlayer";
-import listFriendRequest from "./player/listFriendRequest";
-import listFriends from "./player/listFriends";
-import getAllLobby from "./lobby/getAllLobby";
-const user = {
-  type: GraphQLString,
-  resolve: () => "Hello",
-};
+// import listFriendRequest from "./player/listFriendRequest";
+// import listFriends from "./player/listFriends";
+// import getAllLobby from "./lobby/getAllLobby";
 
 const rootQuery = new GraphQLObjectType({
   name: "Query",
   fields: {
     getPlayer,
-    listFriendRequest,
-    listFriends,
-    getAllLobby,
+    // getPlayers,
+    // listFriendRequest,
+    // listFriends,
+    // getAllLobby,
   },
 });
 

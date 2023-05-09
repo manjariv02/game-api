@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../db/models/User";
-import Player, { IPlayer } from "../db/models/Players";
 
 const loginRouter = express.Router();
 

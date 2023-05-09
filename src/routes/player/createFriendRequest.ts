@@ -18,25 +18,30 @@ const createFriendRequest = {
 
       if (playerId) {
         const player = await Player.findById(playerId);
+        const friend = await Player.findById(friendId);
 
-        if (player) {
-          const existingRequest = player.friendRequests?.includes(friendId);
+        if (player && friend) {
+          const existingRequest = player.friendRequestsSent?.includes(friendId);
+          const requestRecieved = friend.friendRequests?.includes(playerId);
 
-          if (existingRequest)
+          if (existingRequest && requestRecieved)
             throw "Friend request already sent to this player";
 
           const existingFriend = player.friends?.includes(friendId);
+          const existingPlayer = friend.friends?.includes(playerId);
 
-          if (existingFriend) throw "This player is already your friend";
+          if (!existingFriend && !existingPlayer) {
+            player.friendRequestsSent?.push(friendId);
+            const updatedPlayer = await player.save();
 
-          player.friendRequests?.push(friendId);
+            friend.friendRequests?.push(playerId);
+            const updatedFriend = await friend.save();
 
-          const updatedPlayer = await player.save();
-          if (updatedPlayer) {
-            return {
-              result: updatedPlayer,
-              status: 200,
-            };
+            if (updatedPlayer && updatedFriend) {
+              return {
+                status: 200,
+              };
+            }
           }
         }
       }

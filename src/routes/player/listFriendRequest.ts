@@ -1,9 +1,9 @@
-import PlayerType from "./type";
+import PlayerResponseType from "./type";
 import Player from "../../db/models/Players";
 import { Request } from "express";
 
 const listFriendRequest = {
-  type: PlayerType,
+  type: PlayerResponseType,
   resolve: async (parent: any, {}, { req }: { req: Request }) => {
     try {
       const playerId = req.user?.playerId;
