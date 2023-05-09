@@ -12,10 +12,13 @@ const getPlayers = {
       if (playerId) {
         const result = await Player.findById(playerId)
           .populate("lobby")
+          .populate("joinedLobby")
           .populate("friends")
           .populate("friendRequests")
           .populate("friendRequestsSent")
           .populate("inventory");
+
+        console.log(result);
 
         if (result) {
           return {

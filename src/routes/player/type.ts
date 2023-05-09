@@ -6,7 +6,7 @@ import {
 } from "graphql";
 import { IPlayer } from "../../db/models/Players";
 import { responseType } from "../Types";
-import LobbyType from "../lobby/type";
+import { LobbyType } from "../lobby/type";
 import InventoryType from "../inventory/type";
 
 export interface PlayerResponse extends responseType {
@@ -14,7 +14,7 @@ export interface PlayerResponse extends responseType {
   results?: IPlayer[];
 }
 
-const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
+export const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
   name: "Player",
   fields: () => ({
     _id: { type: GraphQLString },
@@ -24,11 +24,12 @@ const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
     friendRequests: { type: new GraphQLList(PlayerType) },
     friendRequestsSent: { type: new GraphQLList(PlayerType) },
     lobby: { type: new GraphQLList(LobbyType) },
+    joinedLobby: { type: new GraphQLList(LobbyType) },
     inventory: { type: new GraphQLList(InventoryType) },
   }),
 });
 
-export default new GraphQLObjectType<PlayerResponse>({
+const PlayerResponseType = new GraphQLObjectType<PlayerResponse>({
   name: "Players",
   fields: () => ({
     result: { type: PlayerType },
@@ -37,3 +38,5 @@ export default new GraphQLObjectType<PlayerResponse>({
     error: { type: GraphQLString },
   }),
 });
+
+export default PlayerResponseType;

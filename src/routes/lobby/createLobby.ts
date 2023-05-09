@@ -1,55 +1,77 @@
 import { GraphQLNonNull, GraphQLString } from "graphql";
-import PlayerType from "../player/type";
 import Player from "../../db/models/Players";
 import { Request } from "express";
-import Lobby from "../../db/models/Lobby";
+import Lobby, { ILobby } from "../../db/models/Lobby";
+import Inventory from "../../db/models/Inventory";
+import LobbyResponseType from "./type";
 
 const createLobby = {
-  type: PlayerType,
+  type: LobbyResponseType,
   args: {
-    friendId: { type: new GraphQLNonNull(GraphQLString) },
+    name: { type: new GraphQLNonNull(GraphQLString) },
   },
   resolve: async (
     parent: any,
-    { friendId }: { friendId: string },
+    { name }: { name: string },
     { req }: { req: Request }
   ) => {
     try {
       const playerId = req.user?.playerId;
 
-      if (playerId) {
-        const player = await Player.findById(playerId);
+      if (playerId && name) {
+        const player = await Player.findById(playerId)
+          .populate("inventory")
+          .populate({
+            path: "lobby",
+            populate: {
+              path: "playerInventory",
+              populate: "inventory player",
+            },
+          });
 
-        if (player) {
-          const existingFriend = player.friends?.includes(friendId);
+        if (player && player.lobby) {
+          const lobbies: ILobby[] = player.lobby;
 
-          if (existingFriend) {
-            const existingLobby = await Lobby.findOne({
-              players: { $all: [playerId, friendId] },
+          if (lobbies.length > 4) throw "Lobby creation limit exceeded!";
+
+          const lastCreatedLobby = lobbies[lobbies.length - 1];
+          if (
+            lobbies.length &&
+            lastCreatedLobby &&
+            lastCreatedLobby.players.length < 2
+          ) {
+            return {
+              status: 200,
+              result: lastCreatedLobby,
+            };
+          }
+
+          const checkLobby = await Lobby.findOne({ name });
+          if (checkLobby) throw "Name already taken!";
+
+          const inventory = await Inventory.create({});
+
+          if (inventory) {
+            const newLobby = await Lobby.create({
+              name,
+              players: [playerId],
+              playerInventory: [{ playerId, inventory }],
+              host: playerId,
+              progress: {
+                season: 0,
+                episode: 0,
+                level: 0,
+              },
             });
 
-            if (existingLobby) throw "Lobby already exists with this friendId";
-            else {
-              const newlobby = new Lobby({
-                name: `Lobby-${playerId}-${friendId}`,
-                players: [playerId, friendId],
-                host: playerId,
-              });
-              const createNewLobby = player.lobby?.push(newlobby);
+            if (newLobby) {
+              player.lobby.push(newLobby._id);
+              player.save();
 
-              if (createNewLobby) {
-                const updatedPlayer = await Promise.all([
-                  player.save(),
-                  newlobby.save(),
-                ]);
-
-                if (updatedPlayer) {
-                  return {
-                    result: updatedPlayer,
-                    status: 200,
-                  };
-                }
-              }
+              return {
+                status: 200,
+                result: newLobby,
+              };
             }
           }
         }

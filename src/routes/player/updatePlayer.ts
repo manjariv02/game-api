@@ -1,10 +1,10 @@
 import { GraphQLInt, GraphQLNonNull, GraphQLString } from "graphql";
-import PlayerType from "./type";
+import PlayerResponseType from "./type";
 import Player, { IPlayer } from "../../db/models/Players";
 import { Request } from "express";
 
 const updatePlayer = {
-  type: PlayerType,
+  type: PlayerResponseType,
   args: {
     name: { type: new GraphQLNonNull(GraphQLString) },
     pic: { type: new GraphQLNonNull(GraphQLInt) },

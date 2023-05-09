@@ -9,6 +9,7 @@ export interface IPlayer extends Document {
   friendRequestsSent?: IPlayer["_id"][];
   friendRequests?: IPlayer["_id"][];
   lobby?: ILobby["_id"][];
+  joinedLobby?: ILobby["_id"][];
   inventory?: IInventory["_id"];
 }
 
@@ -19,6 +20,7 @@ const PlayerSchema: Schema<IPlayer> = new Schema({
   friendRequestsSent: [{ type: Schema.Types.ObjectId, ref: "Player" }],
   friendRequests: [{ type: Schema.Types.ObjectId, ref: "Player" }],
   lobby: [{ type: Schema.Types.ObjectId, ref: "Lobby" }],
+  joinedLobby: [{ type: Schema.Types.ObjectId, ref: "Lobby" }],
   inventory: [{ type: Schema.Types.ObjectId, ref: "Inventory" }],
 });
 

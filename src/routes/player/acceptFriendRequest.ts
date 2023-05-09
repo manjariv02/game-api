@@ -1,10 +1,10 @@
 import { GraphQLNonNull, GraphQLString } from "graphql";
-import PlayerType from "./type";
+import PlayerResponseType from "./type";
 import Player from "../../db/models/Players";
 import { Request } from "express";
 
 const acceptFriendRequest = {
-  type: PlayerType,
+  type: PlayerResponseType,
   args: {
     friendId: { type: new GraphQLNonNull(GraphQLString) },
   },

@@ -8,7 +8,7 @@ export interface ILobby extends Document {
   playerInventory: [
     {
       playerId: IPlayer["_id"];
-      inventory: IInventory;
+      inventory: IInventory["_id"];
     }
   ];
   host: IPlayer;
