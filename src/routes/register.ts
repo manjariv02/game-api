@@ -23,6 +23,7 @@ registerRouter.post("/", async (req: Request, res: Response) => {
 
           if (newInventory) {
             const newPlayer: IPlayer = await Player.create({
+              pic: 0,
               inventory: newInventory._id,
             });
 

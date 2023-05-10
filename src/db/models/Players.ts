@@ -4,7 +4,7 @@ import { IInventory } from "./Inventory";
 
 export interface IPlayer extends Document {
   name?: string;
-  pic?: string;
+  pic?: number;
   friends?: IPlayer["_id"][];
   friendRequestsSent?: IPlayer["_id"][];
   friendRequests?: IPlayer["_id"][];
@@ -15,7 +15,7 @@ export interface IPlayer extends Document {
 
 const PlayerSchema: Schema<IPlayer> = new Schema({
   name: { type: String },
-  pic: { type: String },
+  pic: { type: Number },
   friends: [{ type: Schema.Types.ObjectId, ref: "Player" }],
   friendRequestsSent: [{ type: Schema.Types.ObjectId, ref: "Player" }],
   friendRequests: [{ type: Schema.Types.ObjectId, ref: "Player" }],

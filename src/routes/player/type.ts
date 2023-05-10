@@ -19,7 +19,7 @@ export const PlayerType: GraphQLObjectType<IPlayer> = new GraphQLObjectType({
   fields: () => ({
     _id: { type: GraphQLString },
     name: { type: GraphQLString },
-    pic: { type: GraphQLString },
+    pic: { type: GraphQLInt },
     friends: { type: new GraphQLList(PlayerType) },
     friendRequests: { type: new GraphQLList(PlayerType) },
     friendRequestsSent: { type: new GraphQLList(PlayerType) },
