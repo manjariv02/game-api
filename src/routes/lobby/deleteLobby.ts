@@ -1,11 +1,12 @@
 import { GraphQLNonNull, GraphQLString } from "graphql";
-import PlayerType from "../player/type";
 import Player from "../../db/models/Players";
 import { Request } from "express";
 import Lobby from "../../db/models/Lobby";
+import LobbyResponseType from "./type";
+import Inventory from "../../db/models/Inventory";
 
 const deleteLobby = {
-  type: PlayerType,
+  type: LobbyResponseType,
   args: {
     lobbyId: { type: new GraphQLNonNull(GraphQLString) },
   },
@@ -19,27 +20,47 @@ const deleteLobby = {
 
       if (playerId) {
         const player = await Player.findById(playerId);
+        const lobby = await Lobby.findById(lobbyId);
 
-        if (player) {
-          const getLobby = await Lobby.findById(lobbyId);
+        if (player && lobby && player.lobby?.includes(lobbyId)) {
+          const lobbyIndex = player.lobby.indexOf(lobbyId);
+          if (typeof lobbyIndex === "number" && lobbyIndex > -1) {
+            const removeLobby = player.lobby.splice(lobbyIndex, 1);
+            if (removeLobby) await player.save();
+          }
 
-          const lobbyDetails = getLobby;
-
-          if (lobbyDetails) {
-            const checkHost = lobbyDetails.host.toString() === playerId;
-
-            if (checkHost) {
-              const deleteTheLobby = await Lobby.deleteOne({ _id: lobbyId });
-
-              if (deleteTheLobby) {
-                return {
-                  result: {
-                    _id: lobbyDetails._id,
-                    name: lobbyDetails.name,
-                  },
-                  status: 200,
-                };
+          const otherPlayerId = lobby.players[1];
+          if (otherPlayerId) {
+            const otherPlayer = await Player.findById(otherPlayerId);
+            if (otherPlayer) {
+              const otherPlayerLobbyIndex =
+                otherPlayer.joinedLobby?.indexOf(lobbyId);
+              if (
+                typeof otherPlayerLobbyIndex === "number" &&
+                otherPlayerLobbyIndex > -1
+              ) {
+                const removeJoinedLobby = otherPlayer.joinedLobby?.splice(
+                  otherPlayerLobbyIndex,
+                  1
+                );
+                if (removeJoinedLobby) await otherPlayer.save();
               }
+            }
+          }
+
+          const inventoryIds = lobby.playerInventory.map(
+            (inv) => inv.inventory
+          );
+          if (inventoryIds) {
+            const deleteInv = await Inventory.deleteMany({
+              _id: { $in: inventoryIds },
+            });
+            const dropLobby = await Lobby.findByIdAndRemove(lobbyId);
+
+            if (dropLobby && deleteInv) {
+              return {
+                status: 200,
+              };
             }
           }
         }

@@ -25,8 +25,8 @@ const updateLobbyBodyObject = new GraphQLInputObjectType({
       type: new GraphQLInputObjectType({
         name: "InventoryInputType",
         fields: () => ({
-          normalArr: { type: GraphQLString },
-          fireArr: { type: GraphQLString },
+          normalArr: { type: GraphQLInt },
+          fireArr: { type: GraphQLInt },
         }),
       }),
     },
@@ -69,8 +69,9 @@ const updateLobby = {
 
         if (player && player.lobby) {
           const ownsLobby = player.lobby.includes(lobbyId);
+          const inLobby = player.joinedLobby?.includes(lobbyId);
 
-          if (ownsLobby) {
+          if (ownsLobby || inLobby) {
             const lobby = await Lobby.findById(lobbyId).populate(
               "playerInventory"
             );
@@ -79,10 +80,12 @@ const updateLobby = {
               lobby.progress = { season, episode, level };
               const lobbySaved = await lobby.save();
 
+              let inventorySaved;
+
               for (const item of inventory) {
-                const playerInventory = lobby.playerInventory.find(
-                  (inv) => inv.playerId === item.playerId
-                );
+                const playerInventory = lobby.playerInventory.find((inv) => {
+                  return inv.playerId.equals(item.playerId);
+                });
                 if (playerInventory) {
                   const inventoryId = playerInventory.inventory;
 
@@ -90,16 +93,16 @@ const updateLobby = {
                   if (foundInventory) {
                     foundInventory.normalArr = item.inventory?.normalArr;
                     foundInventory.fireArr = item.inventory?.fireArr;
-                    const inventorySaved = await foundInventory.save();
-
-                    if (inventorySaved && lobbySaved) {
-                      return {
-                        status: 200,
-                        result: lobbySaved,
-                      };
-                    }
+                    inventorySaved = await foundInventory.save();
                   }
                 }
+              }
+
+              if (lobbySaved && inventorySaved) {
+                return {
+                  status: 200,
+                  result: lobbySaved,
+                };
               }
             }
           }

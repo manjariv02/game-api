@@ -8,6 +8,7 @@ import createLobby from "./lobby/createLobby";
 import updateLobby from "./lobby/updateLobby";
 import deleteLobby from "./lobby/deleteLobby";
 import updateInventory from "./inventory/updateInventory";
+import joinLobby from "./lobby/joinLobby";
 
 const rootMutations = new GraphQLObjectType({
   name: "Mutation",
@@ -19,6 +20,7 @@ const rootMutations = new GraphQLObjectType({
     createLobby,
     updateLobby,
     deleteLobby,
+    joinLobby,
   },
 });
 
