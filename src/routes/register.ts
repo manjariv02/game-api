@@ -39,7 +39,7 @@ registerRouter.post("/", async (req: Request, res: Response) => {
                   playerId: newPlayer._id,
                   userId: newUser._id,
                 };
-                const token = jwt.sign(payload, "secret", {
+                const token = jwt.sign(payload, process.env.JWT_SECRET, {
                   expiresIn: "1h",
                 });
 

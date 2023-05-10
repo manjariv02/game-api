@@ -11,7 +11,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
     if (authorization) {
       const decoded: jwtPayload = <JwtPayload>(
-        jwt.verify(authorization.split(" ")[1], "secret")
+        jwt.verify(authorization.split(" ")[1], process.env.JWT_SECRET)
       );
       if (decoded) {
         req.user = {
