@@ -3,36 +3,62 @@ import {
   GraphQLString,
   GraphQLInputObjectType,
   GraphQLInt,
+  GraphQLList,
 } from "graphql";
-import PlayerType from "../player/type";
 import Player from "../../db/models/Players";
 import { Request } from "express";
 import Lobby, { ILobby } from "../../db/models/Lobby";
+import LobbyResponseType from "./type";
+import Inventory, { IInventory } from "../../db/models/Inventory";
+import InventoryType from "../inventory/type";
 
-interface LobbyUpdateInput {
-  season?: number;
-  episode?: number;
-  level?: number;
+interface InventoryBodyType {
+  playerId: string;
+  inventory: IInventory;
 }
 
-const LobbyUpdateInputType = new GraphQLInputObjectType({
-  name: "LobbyUpdateInput",
+const updateLobbyBodyObject = new GraphQLInputObjectType({
+  name: "UpdateLobbyInputType",
   fields: () => ({
-    season: { type: new GraphQLNonNull(GraphQLInt) },
-    episode: { type: new GraphQLNonNull(GraphQLInt) },
-    level: { type: new GraphQLNonNull(GraphQLInt) },
+    playerId: { type: GraphQLString },
+    inventory: {
+      type: new GraphQLInputObjectType({
+        name: "InventoryInputType",
+        fields: () => ({
+          normalArr: { type: GraphQLString },
+          fireArr: { type: GraphQLString },
+        }),
+      }),
+    },
   }),
 });
 
 const updateLobby = {
-  type: PlayerType,
+  type: LobbyResponseType,
   args: {
     lobbyId: { type: new GraphQLNonNull(GraphQLString) },
-    input: { type: new GraphQLNonNull(LobbyUpdateInputType) },
+    season: { type: new GraphQLNonNull(GraphQLInt) },
+    episode: { type: new GraphQLNonNull(GraphQLInt) },
+    level: { type: new GraphQLNonNull(GraphQLInt) },
+    inventory: {
+      type: new GraphQLNonNull(new GraphQLList(updateLobbyBodyObject)),
+    },
   },
   resolve: async (
     parent: any,
-    { lobbyId, input }: { lobbyId: string; input: LobbyUpdateInput },
+    {
+      lobbyId,
+      season,
+      episode,
+      level,
+      inventory,
+    }: {
+      lobbyId: string;
+      season: number;
+      episode: number;
+      level: number;
+      inventory: InventoryBodyType[];
+    },
     { req }: { req: Request }
   ) => {
     try {
@@ -41,40 +67,38 @@ const updateLobby = {
       if (playerId) {
         const player = await Player.findById(playerId);
 
-        if (player) {
-          const existingLobby = await Lobby.findById(lobbyId);
+        if (player && player.lobby) {
+          const ownsLobby = player.lobby.includes(lobbyId);
 
-          if (existingLobby) {
-            const checkPlayer = await Lobby.findOne({
-              players: { $all: [playerId] },
-            });
+          if (ownsLobby) {
+            const lobby = await Lobby.findById(lobbyId).populate(
+              "playerInventory"
+            );
 
-            if (checkPlayer) {
-              const update = {
-                ...existingLobby.progress,
-                season: input.season ?? existingLobby.progress.season,
-                episode: input.episode ?? existingLobby.progress.episode,
-                level: input.level ?? existingLobby.progress.level,
-              };
-              existingLobby.progress = update;
+            if (lobby) {
+              lobby.progress = { season, episode, level };
+              const lobbySaved = await lobby.save();
 
-              if (update) {
-                const saveLobbyDetail = await existingLobby.save();
-                const updatedValue = saveLobbyDetail;
+              for (const item of inventory) {
+                const playerInventory = lobby.playerInventory.find(
+                  (inv) => inv.playerId === item.playerId
+                );
+                if (playerInventory) {
+                  const inventoryId = playerInventory.inventory;
 
-                if (updatedValue) {
-                  return {
-                    result: {
-                      lobby: {
-                        progress: {
-                          episode: updatedValue.progress.episode,
-                          level: updatedValue.progress.level,
-                          season: updatedValue.progress.season,
-                        },
-                      },
-                    },
-                    status: 200,
-                  };
+                  const foundInventory = await Inventory.findById(inventoryId);
+                  if (foundInventory) {
+                    foundInventory.normalArr = item.inventory?.normalArr;
+                    foundInventory.fireArr = item.inventory?.fireArr;
+                    const inventorySaved = await foundInventory.save();
+
+                    if (inventorySaved && lobbySaved) {
+                      return {
+                        status: 200,
+                        result: lobbySaved,
+                      };
+                    }
+                  }
                 }
               }
             }
