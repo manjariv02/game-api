@@ -21,9 +21,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         return next();
       }
     }
-    throw res.status(401).json({ msg: "token missing" });
+    throw res.status(500).json({ msg: "token missing" });
   } catch (error) {
-    res.status(401).json({ msg: error });
+    res.status(500).json({ msg: error });
   }
 };
 
