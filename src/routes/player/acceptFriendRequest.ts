@@ -21,6 +21,7 @@ const acceptFriendRequest = {
           playerId,
           friendId
         );
+
         const acceptFriendsRequest = await acceptFriendAndRemoveRequests(
           friendId,
           playerId
@@ -52,8 +53,10 @@ const acceptFriendAndRemoveRequests = async (
 
     if (player) {
       const checkInFriendRequests = player.friendRequests?.includes(friendId);
+      const checkInSentFriendRequests =
+        player.friendRequestsSent?.includes(friendId);
 
-      if (checkInFriendRequests) {
+      if (checkInFriendRequests || checkInSentFriendRequests) {
         const existingFriend = player.friends?.includes(friendId);
 
         if (existingFriend) throw "This player is already your friend";
