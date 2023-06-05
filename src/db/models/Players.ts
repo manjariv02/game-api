@@ -11,6 +11,7 @@ export interface IPlayer extends Document {
   lobby?: ILobby["_id"][];
   joinedLobby?: ILobby["_id"][];
   inventory?: IInventory["_id"];
+  profileId?: string;
 }
 
 const PlayerSchema: Schema<IPlayer> = new Schema({
@@ -22,6 +23,7 @@ const PlayerSchema: Schema<IPlayer> = new Schema({
   lobby: [{ type: Schema.Types.ObjectId, ref: "Lobby" }],
   joinedLobby: [{ type: Schema.Types.ObjectId, ref: "Lobby" }],
   inventory: [{ type: Schema.Types.ObjectId, ref: "Inventory" }],
+  profileId: { type: String, unique: true },
 });
 
 export default mongoose.model<IPlayer>("Player", PlayerSchema);

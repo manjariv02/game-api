@@ -58,9 +58,9 @@ const createLobby = {
               playerInventory: [{ playerId, inventory }],
               host: playerId,
               progress: {
-                season: 0,
-                episode: 0,
-                level: 0,
+                season: 1,
+                episode: 1,
+                level: 1,
               },
             });
 

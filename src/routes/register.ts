@@ -19,12 +19,16 @@ registerRouter.post("/", async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         if (hashedPassword) {
+          const randomNumber = Math.floor(Math.random() * 1000000);
+          const profileId: string = randomNumber.toString();
+
           const newInventory: IInventory = await Inventory.create({});
 
           if (newInventory) {
             const newPlayer: IPlayer = await Player.create({
               pic: 0,
               inventory: newInventory._id,
+              profileId: profileId,
             });
 
             if (newPlayer) {
